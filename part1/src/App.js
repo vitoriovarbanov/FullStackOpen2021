@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from './components/Button';
 import Content from './components/Content';
+import Statistics from './components/Statistics';
 
 const App = () => {
   const [good, setGood] = useState(0)
@@ -21,6 +22,8 @@ const App = () => {
     return handler
   }
  */
+
+
   return (
     <>
       <h1>Give Feedback</h1>
@@ -31,6 +34,7 @@ const App = () => {
       <Content text='good' count={good} />
       <Content text='neutral' count={neutral} />
       <Content text='bad' count={bad} />
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </>
   );
 }
