@@ -1,9 +1,6 @@
 import React from 'react';
 
 const Statistics = ({ good, neutral, bad }) => {
-    /* console.log(good)
-    console.log(neutral)
-    console.log(bad) */
 
     const calculateAverage = () => {
         let average = (good - bad) / (good + neutral + bad)
@@ -14,7 +11,7 @@ const Statistics = ({ good, neutral, bad }) => {
     }
 
     const calculatePositive = () => {
-        let positive = (good/(good+neutral+bad))*100
+        let positive = (good / (good + neutral + bad)) * 100
         if (Number.isNaN(positive)) {
             positive = 0
         }
@@ -23,15 +20,22 @@ const Statistics = ({ good, neutral, bad }) => {
 
     return (
         <>
-            <div>
-                all {good + bad + neutral}
-            </div>
-            <div>
-                average {calculateAverage()}
-            </div>
-            <div>
-                positive {calculatePositive()}%
-            </div>
+            <tr>
+                <td>
+                    all {good + bad + neutral}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    average {calculateAverage()}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    positive {calculatePositive()}%
+                </td>
+
+            </tr>
         </>
     )
 }

@@ -23,7 +23,6 @@ const App = () => {
   }
  */
 
-
   return (
     <>
       <h1>Give Feedback</h1>
@@ -31,10 +30,20 @@ const App = () => {
       <Button onClick={() => setNeutral(neutral + 1)} text='neutral' />
       <Button onClick={() => setBad(bad + 1)} text='bad' />
       <h3>Statistics</h3>
-      <Content text='good' count={good} />
-      <Content text='neutral' count={neutral} />
-      <Content text='bad' count={bad} />
-      <Statistics good={good} neutral={neutral} bad={bad} />
+      {
+        good + neutral + bad === 0 ? 'No feedback given' :
+          <>
+            <table>
+              <tbody>
+                <Content text='good' count={good} />
+                <Content text='neutral' count={neutral} />
+                <Content text='bad' count={bad} />
+                <Statistics good={good} neutral={neutral} bad={bad} />
+              </tbody>
+            </table>
+          </>
+      }
+
     </>
   );
 }
