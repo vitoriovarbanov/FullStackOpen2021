@@ -105,7 +105,15 @@ const App = () => {
 
     const duplicatePersons = persons.find(x => x.name === personObject.name)
     if (duplicatePersons) {
-      window.alert(`${personObject.name} is already added to phonebook`)
+      let updatedPersonObject = {...duplicatePersons,...personObject}
+      window.confirm(`${duplicatePersons.name} is already added to phonebook, replace the old number with new one?`)
+      phonebookAPI
+        .updateNumber(duplicatePersons.id, updatedPersonObject)
+        .then(data => {
+          console.log(data)
+          initialLoad()
+        })
+        .catch(err=>console.log(err))
     } else {
       phonebookAPI
         .addPersonToPhonebook(personObject)
@@ -125,8 +133,6 @@ const App = () => {
       .deletePerson(id)
       .then(data => {
         initialLoad()
-        /* setPersons(persons)
-        setSearchRes(persons) */
         console.log(`Entry successfully deleted!`)
       })
       .catch(err => console.log(err))

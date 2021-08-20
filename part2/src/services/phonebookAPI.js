@@ -15,8 +15,13 @@ const addPersonToPhonebook = (personObj) => {
 
 const deletePerson = (id) => {
     const request = axios.delete(`${base_url}/${id}`)
-    return request.then(res=>res.data)
+    return request.then(res => res.data)
+}
+
+const updateNumber = (id, newPersonObj) => {
+    const request = axios.put(`${base_url}/${id}`, newPersonObj)
+    return request.then(res => res.data)
 }
 
 
-export default { getAll, addPersonToPhonebook, deletePerson }
+export default { getAll, addPersonToPhonebook, deletePerson, updateNumber }
