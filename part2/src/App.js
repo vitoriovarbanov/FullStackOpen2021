@@ -69,6 +69,7 @@ const App = () => {
 import Persons from './components/Phonebook/Persons'
 import Search from './components/Phonebook/Search'
 import PersonForm from './components/Phonebook/PersonForm'
+import {SuccessNotification, ErrorNotification } from './components/Notifications/Notification'
 
 import phonebookAPI from './services/phonebookAPI'
 
@@ -78,6 +79,8 @@ const App = () => {
   const [number, setNewNumber] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [searchRes, setSearchRes] = useState([])
+  const [successMsg, setSuccessMsg] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => initialLoad(), [])
 
@@ -105,7 +108,7 @@ const App = () => {
 
     const duplicatePersons = persons.find(x => x.name === personObject.name)
     if (duplicatePersons) {
-      let updatedPersonObject = {...duplicatePersons,...personObject}
+      let updatedPersonObject = { ...duplicatePersons, ...personObject }
       window.confirm(`${duplicatePersons.name} is already added to phonebook, replace the old number with new one?`)
       phonebookAPI
         .updateNumber(duplicatePersons.id, updatedPersonObject)
@@ -113,12 +116,20 @@ const App = () => {
           console.log(data)
           initialLoad()
         })
-        .catch(err=>console.log(err))
+        .catch(err => {
+          setErrorMsg(`${err}`)
+          setTimeout(() => {
+            setErrorMsg('')
+          }, 4000)
+        })
     } else {
       phonebookAPI
         .addPersonToPhonebook(personObject)
         .then(data => {
-          console.log(data)
+          setSuccessMsg(`${data.name} added to your contacts!`)
+          setTimeout(() => {
+            setSuccessMsg('')
+          }, 4000)
           setPersons(persons.concat(data))
           setSearchRes(persons.concat(data))
         })
@@ -133,9 +144,15 @@ const App = () => {
       .deletePerson(id)
       .then(data => {
         initialLoad()
+        setSuccessMsg(`${name} deleted from your contacts!`)
+        setTimeout(() => {
+          setSuccessMsg('')
+        }, 4000)
         console.log(`Entry successfully deleted!`)
       })
-      .catch(err => console.log(err))
+      .catch(err => {
+        setErrorMsg(`Information for ${name} has already been removed from the server`)
+      })
   }
 
   const handleNameChange = (e) => {
@@ -146,13 +163,15 @@ const App = () => {
     setNewNumber(e.target.value)
   }
 
+
   return (
     <div>
       <h2>Phonebook</h2>
+      <SuccessNotification successMsg={successMsg} />
+      <ErrorNotification errorMsg={errorMsg}/>
       <Search
         searchTerm={searchTerm}
         handleSearchTerm={handleSearchTerm}
-
       />
       <h3>Add new</h3>
       <PersonForm
