@@ -1,6 +1,6 @@
 import React from 'react'
 
-const PersonForm = ({ addPerson, personName, personNumber,handleNameChange,handleNumberChange }) => {
+const PersonForm = ({ addPerson, personName, personNumber, handleNameChange, handleNumberChange }) => {
 
     return (
         <>
