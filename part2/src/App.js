@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import axios from 'axios'
+import React, { useState, useEffect } from 'react'
+//import axios from 'axios'
 
 ///// 1
 
@@ -70,6 +70,8 @@ import Persons from './components/Phonebook/Persons'
 import Search from './components/Phonebook/Search'
 import PersonForm from './components/Phonebook/PersonForm'
 
+import phonebookAPI from './services/phonebookAPI'
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
@@ -77,15 +79,16 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchRes, setSearchRes] = useState([])
 
-  useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(res => {
-        const data = res.data
+  useEffect(() => initialLoad(), [])
+
+  const initialLoad = () => {
+    phonebookAPI
+      .getAll()
+      .then(data => {
         setPersons(data)
         setSearchRes(data)
       })
-  }, [])
+  }
 
   const handleSearchTerm = (e) => {
     setSearchTerm(e.target.value || '')
@@ -102,12 +105,37 @@ const App = () => {
 
     const duplicatePersons = persons.find(x => x.name === personObject.name)
     if (duplicatePersons) {
-      window.alert(`${personObject.name} is already added to phonebook`)
+      let updatedPersonObject = {...duplicatePersons,...personObject}
+      window.confirm(`${duplicatePersons.name} is already added to phonebook, replace the old number with new one?`)
+      phonebookAPI
+        .updateNumber(duplicatePersons.id, updatedPersonObject)
+        .then(data => {
+          console.log(data)
+          initialLoad()
+        })
+        .catch(err=>console.log(err))
     } else {
-      setPersons(persons.concat(personObject))
+      phonebookAPI
+        .addPersonToPhonebook(personObject)
+        .then(data => {
+          console.log(data)
+          setPersons(persons.concat(data))
+          setSearchRes(persons.concat(data))
+        })
       setNewName('')
       setNewNumber('')
     }
+  }
+
+  const deleteContact = (id, name) => {
+    window.confirm(`Delete ${name}?`)
+    phonebookAPI
+      .deletePerson(id)
+      .then(data => {
+        initialLoad()
+        console.log(`Entry successfully deleted!`)
+      })
+      .catch(err => console.log(err))
   }
 
   const handleNameChange = (e) => {
@@ -137,7 +165,7 @@ const App = () => {
       <h2>Numbers</h2>
       <div>
         {searchRes.map(person => {
-          return <Persons key={person.name} person={person} />
+          return <Persons key={person.id} person={person} deleteContact={() => deleteContact(person.id, person.name)} />
         })}
       </div>
     </div>
@@ -145,7 +173,7 @@ const App = () => {
 }
 
 
-export default App 
+export default App
 
 
 ////////////////////////////// 3
@@ -166,7 +194,7 @@ const App = () => {
         setCountries(filtered)
       })
 
-  }  
+  }
 
   return (
     <div>
