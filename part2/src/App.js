@@ -66,9 +66,9 @@ const App = () => {
 
 /////////////////////////  2
 
-/* import Persons from './components/Persons'
-import Search from './components/Search'
-import PersonForm from './components/PersonForm'
+import Persons from './components/Phonebook/Persons'
+import Search from './components/Phonebook/Search'
+import PersonForm from './components/Phonebook/PersonForm'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -145,9 +145,12 @@ const App = () => {
 }
 
 
-export default App */
+export default App 
 
-import DisplayCountries from './components/Countries/DisplayCountries'
+
+////////////////////////////// 3
+
+/* import DisplayCountries from './components/Countries/DisplayCountries'
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -175,4 +178,4 @@ const App = () => {
 }
 
 
-export default App 
+export default App  */
