@@ -1,9 +1,11 @@
 const express = require('express')
 const app = express()
-var moment = require('moment')
-var format = 'HH:mm:ss';
+const moment = require('moment')
+const morgan = require('morgan')
 
 app.use(express.json())
+
+app.use(morgan('tiny'))
 
 let people = [
     {
