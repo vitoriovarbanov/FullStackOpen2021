@@ -2,8 +2,11 @@ const express = require('express')
 const app = express()
 const moment = require('moment')
 const morgan = require('morgan')
+const cors = require('cors')
 
 app.use(express.json())
+
+app.use(cors())
 
 morgan.token('type', function (req, res) {
     if(req.method==='POST'){
@@ -32,7 +35,7 @@ let people = [
     {
         "id": 4,
         "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
+        "number": "00-23-6423122"
     }
 ]
 
