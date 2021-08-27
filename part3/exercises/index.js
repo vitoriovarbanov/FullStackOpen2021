@@ -3,6 +3,7 @@ const app = express()
 const moment = require('moment')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/mongo')
 
 app.use(express.json())
 
@@ -44,7 +45,9 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/people', (req, res) => {
-    res.json(people)
+    Person.find({}).then(person => {
+        res.json(person)
+      })
 })
 
 app.get('/info', (req, res) => {
