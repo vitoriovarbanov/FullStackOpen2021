@@ -5,12 +5,16 @@ if (process.argv.length < 3) {
   process.exit(1)
 }
 
-const password = process.argv[2]
-
-const url =
-  `mongodb+srv://vitorio00:${password}@cluster0.gkvm0.mongodb.net/test?retryWrites=true&w=majority`
+const url = process.env.MONGODB_URI
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(result => {
+        console.log('connected to MongoDB')
+    })
+    .catch((error) => {
+        console.log('error connecting to MongoDB:', error.message)
+    })
+
 
 const personSchema = new mongoose.Schema({
   id: String,
@@ -26,9 +30,7 @@ personSchema.set('toJSON', {
   }
 })
 
-const Person = mongoose.model('Person', personSchema)
-
-const db = mongoose.connection;
+/* const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
   if (process.argv[3] === undefined || process.argv[4] === undefined) {
@@ -51,6 +53,6 @@ db.once('open', function () {
     console.log('person saved!')
     mongoose.connection.close()
   })
-});
+}); */
 
 module.exports = mongoose.model('Person', personSchema)

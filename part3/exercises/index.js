@@ -3,6 +3,7 @@ const app = express()
 const moment = require('moment')
 const morgan = require('morgan')
 const cors = require('cors')
+require('dotenv').config()
 const Person = require('./models/mongo')
 
 app.use(express.json())
@@ -16,29 +17,6 @@ morgan.token('type', function (req, res) {
 })
 
 app.use(morgan(':method :url :status :type'))
-
-let people = [
-    {
-        "id": 1,
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": 2,
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": 3,
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": 4,
-        "name": "Mary Poppendieck",
-        "number": "00-23-6423122"
-    }
-]
 
 app.get('/', (req, res) => {
     res.send(`WELCOMEE`)
@@ -60,13 +38,16 @@ app.get('/info', (req, res) => {
 })
 
 app.get('/api/people/:id', (req, res) => {
-    const id = Number(req.params.id)
+    Person.findById(req.params.id).then(person=>{
+        res.json(person)
+    })
+    /* const id = Number(req.params.id)
     const person = people.find(x => x.id === id)
     if (person) {
         res.json(person)
     } else {
         res.send(400).end()
-    }
+    } */
 })
 
 app.delete('/api/people/:id', (req, res) => {
@@ -76,7 +57,7 @@ app.delete('/api/people/:id', (req, res) => {
 })
 
 app.post('/api/people', (req, res) => {
-    const id = Math.random().toString(36).slice(2);
+    //const id = Math.random().toString(36).slice(2);
     const body = req.body
     console.log(body.content)
 
@@ -86,17 +67,20 @@ app.post('/api/people', (req, res) => {
         })
     }
 
-    const newPerson = { ...req.body, id }
+    const person = new Person({
+        name: body.name,
+        number: body.number
+    })
 
-    const duplicatedName = people.find(x => x.name === newPerson.name)
+   /*  const duplicatedName = people.find(x => x.name === newPerson.name)
     if (duplicatedName) {
         return res.status(400).json({
             error: 'The name is already existing in the phonebook!'
         })
-    }
-
-    people = people.concat(newPerson)
-    res.json(newPerson)
+    } */
+    person.save().then(savedPerson=>{
+        res.json(savedPerson)
+    })
 })
 
 
