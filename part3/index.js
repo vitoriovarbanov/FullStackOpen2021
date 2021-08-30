@@ -27,14 +27,16 @@ app.get('/notes', (req, res) => {
     })
 })
 
-app.get('/api/notes/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const note = notes.find(note => note.id === id)
-    if (note) {
-        res.json(note)
-    } else {
-        res.send(400).end()
-    }
+app.get('/api/notes/:id', (req, res, next) => {
+    Note.findById(req.params.id).then(note => {
+        if (note) {
+            res.json(note)
+        } else {
+            res.status(404).end()
+        }
+    }).catch(err => {
+        next(err)
+    })
 })
 
 /* const generateId = () => {
@@ -58,15 +60,32 @@ app.post('/api/notes', (req, res) => {
         date: new Date(),
     })
 
-    note.save().then(savedNote=>{
+    note.save().then(savedNote => {
         res.json(savedNote)
     })
 })
 
-app.delete('/api/notes/:id', (req, res) => {
-    Note.findById(req.params.id).then(note=>{
-        res.json(note)
-    })
+app.delete('/api/notes/:id', (req, res, next) => {
+    Note.findByIdAndRemove(req.params.id)
+        .then(result => {
+            res.status(204).end()
+        })
+        .catch(err => next(err))
+})
+
+app.put('/api/notes/:id', (request, response, next) => {
+    const body = request.body
+
+    const note = {
+        content: body.content,
+        important: body.important,
+    }
+
+    Note.findByIdAndUpdate(request.params.id, note, { new: true })
+        .then(updatedNote => {
+            response.json(updatedNote)
+        })
+        .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
@@ -74,6 +93,19 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+
+// this has to be the last loaded middleware.
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT)
