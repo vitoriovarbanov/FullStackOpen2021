@@ -106,7 +106,7 @@ const App = () => {
       number
     }
 
-    const duplicatePersons = persons.find(x => x.name === personObject.name)
+    /* const duplicatePersons = persons.find(x => x.name === personObject.name)
     if (duplicatePersons) {
       let updatedPersonObject = { ...duplicatePersons, ...personObject }
       window.confirm(`${duplicatePersons.name} is already added to phonebook, replace the old number with new one?`)
@@ -122,7 +122,7 @@ const App = () => {
             setErrorMsg('')
           }, 4000)
         })
-    } else {
+    } else { */
       phonebookAPI
         .addPersonToPhonebook(personObject)
         .then(data => {
@@ -133,9 +133,16 @@ const App = () => {
           setPersons(persons.concat(data))
           setSearchRes(persons.concat(data))
         })
+        .catch(err=>{
+          console.log(err.response.data)
+          setErrorMsg(err.response.data.error)
+          setTimeout(() => {
+            setErrorMsg('')
+          }, 4000)
+        })
       setNewName('')
       setNewNumber('')
-    }
+    //}
   }
 
   const deleteContact = (id, name) => {
