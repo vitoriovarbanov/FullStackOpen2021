@@ -11,7 +11,7 @@ app.use(express.json())
 app.use(cors())
 
 morgan.token('type', function (req, res) {
-    if(req.method==='POST'){
+    if (req.method === 'POST') {
         return JSON.stringify(req.body)
     }
 })
@@ -25,22 +25,27 @@ app.get('/', (req, res) => {
 app.get('/api/people', (req, res) => {
     Person.find({}).then(person => {
         res.json(person)
-      })
+    })
 })
 
 app.get('/info', (req, res) => {
     var timestamps = moment().format()
-    const html = `
-    Phonebook has info for ${people.length} people<br><br>
-    ${timestamps}
-    `
-    res.send(html)
+    Person.count({}, function (error, numOfDocs) {
+        console.log('I have ' + numOfDocs + ' documents in my collection');
+        const html = `
+        Phonebook has info for ${numOfDocs} people<br><br>
+        ${timestamps}
+        `
+        res.send(html)
+    });
+
 })
 
-app.get('/api/people/:id', (req, res) => {
-    Person.findById(req.params.id).then(person=>{
+app.get('/api/people/:id', (req, res, next) => {
+    Person.findById(req.params.id).then(person => {
         res.json(person)
     })
+        .catch(err => next(err))
     /* const id = Number(req.params.id)
     const person = people.find(x => x.id === id)
     if (person) {
@@ -50,10 +55,12 @@ app.get('/api/people/:id', (req, res) => {
     } */
 })
 
-app.delete('/api/people/:id', (req, res) => {
-    const id = Number(req.params.id)
-    people = people.filter(x => x.id !== id)
-    res.send(204).end()
+app.delete('/api/people/:id', (req, res, next) => {
+    Person.findByIdAndRemove(req.params.id)
+        .then(result => {
+            res.status(204).end()
+        })
+        .catch(err => next(err))
 })
 
 app.post('/api/people', (req, res) => {
@@ -72,19 +79,46 @@ app.post('/api/people', (req, res) => {
         number: body.number
     })
 
-   /*  const duplicatedName = people.find(x => x.name === newPerson.name)
-    if (duplicatedName) {
-        return res.status(400).json({
-            error: 'The name is already existing in the phonebook!'
-        })
-    } */
-    person.save().then(savedPerson=>{
+    /*  const duplicatedName = people.find(x => x.name === newPerson.name)
+     if (duplicatedName) {
+         return res.status(400).json({
+             error: 'The name is already existing in the phonebook!'
+         })
+     } */
+    person.save().then(savedPerson => {
         res.json(savedPerson)
     })
 })
 
+app.put('/api/people/:id', (req, res, next) => {
+    const body = req.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updatedNumber => {
+            res.json(updatedNumber)
+        })
+        .catch(err => next(err))
+})
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
+
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+    console.log(`Server running on port ${PORT}`)
 })
