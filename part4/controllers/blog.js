@@ -1,22 +1,33 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/mongo')
+const User = require('../models/user')
 
-blogsRouter.get('/', (request, response) => {
-    Blog
-        .find({})
-        .then(blogs => {
-            response.json(blogs)
-        })
+blogsRouter.get('/', async (request, res) => {
+    const blogs = await Blog
+        .find({}).populate('user', { username: 1, name: 1 })
+
+        res.json(blogs)
 })
 
-blogsRouter.post('/', (request, response) => {
-    const blog = new Blog(request.body)
+blogsRouter.post('/', async (request, response, next) => {
+    const body = request.body
 
-    blog
-        .save()
-        .then(result => {
-            response.status(201).json(result)
-        })
+    const user = await User.findById(body.userId)
+
+    const blog = new Blog({
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes,
+        user: user._id
+    })
+
+    try {
+        const savedBlog = await blog.save()
+        response.json(savedBlog)
+    } catch (err) {
+        next(err)
+    }
 })
 
 blogsRouter.get('/:id', (req, res) => {
@@ -42,7 +53,7 @@ blogsRouter.put('/:id', async (req, res, next) => {
         .then(result => {
             res.send(updatedBlog)
         })
-        .catch(err=>next(err))
+        .catch(err => next(err))
 
 })
 
