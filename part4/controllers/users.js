@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 usersRouter.get('/', async (req, res) => {
+    console.log(req.headers)
     const users = await User.find({}).populate('blogs', { title: 1, author: 1 })
 
     res.send(users)
