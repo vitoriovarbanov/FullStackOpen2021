@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { SuccessMsg, ErrorMsg } from './components/notifications'
+
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -13,6 +15,9 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+
+  const [successMsg, setSuccessMsg] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -43,8 +48,15 @@ const App = () => {
       setUsername('')
       setPassword('')
       console.log(`User logging in`, loggedUser)
+      setSuccessMsg(`User logged in - ${loggedUser.username}`)
+      setTimeout(() => {
+        setSuccessMsg('')
+      }, 4000)
     } catch (err) {
-
+      setErrorMsg('Wrong username or password!')
+      setTimeout(() => {
+        setErrorMsg('')
+      }, 4000)
     }
   }
 
@@ -110,7 +122,10 @@ const App = () => {
       const res = await blogService.addBlogPost(blog)
       setBlogs(blogs.concat(res))
     } catch (e) {
-
+      setErrorMsg('Wrong or missing authorization!')
+      setTimeout(() => {
+        setErrorMsg('')
+      }, 4000)
     }
   }
 
@@ -121,6 +136,12 @@ const App = () => {
 
   return (
     <div>
+      <div>
+        <SuccessMsg message={successMsg} />
+      </div>
+      <div>
+        <ErrorMsg message={errorMsg} />
+      </div>
       <div>
         {!user ? renderLoginForm() : renderBlogList()}
       </div>
