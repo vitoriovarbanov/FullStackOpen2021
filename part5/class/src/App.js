@@ -49,6 +49,7 @@ const App = () => {
         setNotes(notes.map(note => note.id !== id ? note : returnedNote))
       })
       .catch(error => {
+        console.log(error)
         setErrorMessage(
           `Note '${note.content}' was already removed from server`
         )
@@ -85,10 +86,10 @@ const App = () => {
   const addNote = (noteObject) => {
     noteFormRef.current.toggleVisibility()
     noteService
-          .create(noteObject)
-          .then(returnedNote => {
-            setNotes(notes.concat(returnedNote))
-          })
+      .create(noteObject)
+      .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+      })
   }
 
   const noteForm = () => {
