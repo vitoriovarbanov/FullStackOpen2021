@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Toggleable from '../components/Toggleable'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, getAllBLogs, tokenId }) => {
   const [likes, setLikes] = useState(null)
-  const [creator, setCreator] = useState(false)
+
+  const [creator, setCreator ] = useState('')
 
   useEffect(() => {
     async function fetchData() {
       const neededBlog = await blogService.getById(blog.id)
       setLikes(neededBlog.likes)
-      console.log(neededBlog.user)
+      setCreator(neededBlog.user)
     }
     fetchData()
   })
@@ -34,16 +35,21 @@ const Blog = ({ blog }) => {
       }, neededBlog.id)
 
       setLikes(updatedBlog.likes)
-
     } catch (e) {
 
     }
   }
 
   const removeBlog = async (id) => {
-    const neededBlog = await blogService.deleteBlog(id)
-    console.log(neededBlog)
+    if (window.confirm(`Delete this blog?`)) {
+      try {
+        const neededBlog = await blogService.deleteBlog(id)
+        console.log(neededBlog)
+        getAllBLogs()
+      } catch (e) {
+      }
 
+    }
   }
 
 
@@ -63,7 +69,9 @@ const Blog = ({ blog }) => {
           <p>{blog.author}</p>
         </div>
         <div>
-          <button onClick={() => { removeBlog(blog.id) }} style={{marginBottom: '10px', backgroundColor: 'red'}}>Remove</button>
+          {
+            tokenId === creator ? <button onClick={() => { removeBlog(blog.id) }} style={{ marginBottom: '10px', backgroundColor: 'red' }}>Remove</button> : ''
+          }          
         </div>
       </Toggleable>
     </div>

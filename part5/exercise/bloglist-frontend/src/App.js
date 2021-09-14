@@ -7,6 +7,8 @@ import { SuccessMsg, ErrorMsg } from './components/notifications'
 import Toggleable from './components/Toggleable'
 import BlogForm from './components/BlogForm'
 
+import jwt from 'jwt-decode'
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
 
@@ -17,15 +19,21 @@ const App = () => {
   const [successMsg, setSuccessMsg] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
 
+  const [tokenId, setTokenId] = useState('') 
+
   useEffect(() => {
+    getAllBLogs()
+  }, [])
+
+  const getAllBLogs = () => {
     blogService.getAll().then(blogs => {
       const sorted = blogs.sort((a, b) => {
-        return b.likes-a.likes
+        return b.likes - a.likes
       })
       setBlogs(sorted)
     }
     )
-  }, [])
+  }
 
   useEffect(() => {
     const loggedIn = localStorage.getItem('user')
@@ -33,6 +41,9 @@ const App = () => {
       const user = JSON.parse(loggedIn)
       setUser(user)
       blogService.setToken(user.token)
+      const authenticatedUser = JSON.parse(localStorage.getItem('user'))
+      const decoded = jwt(authenticatedUser.token)
+      setTokenId(decoded.id)
     }
   }, [])
 
@@ -93,9 +104,10 @@ const App = () => {
     try {
       const res = await blogService.addBlogPost(blog)
       const sorted = blogs.sort((a, b) => {
-        return b.likes-a.likes
+        return b.likes - a.likes
       })
       setBlogs(sorted.concat(res))
+      getAllBLogs()
     } catch (e) {
       setErrorMsg('Wrong or missing authorization!')
       setTimeout(() => {
@@ -121,7 +133,7 @@ const App = () => {
           </Toggleable>
         </div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} getAllBLogs={getAllBLogs} tokenId={tokenId}/>
         )}
       </>
     )
