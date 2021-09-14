@@ -50,6 +50,10 @@ blogsRouter.get('/:id', (req, res) => {
 blogsRouter.delete('/:id', middleware.userExtractor, async (req, res) => {
     const blog = await Blog.findById(req.params.id)
 
+    if(!blog.user){
+        return res.status(401).json({error: 'User not found'})
+    }
+    
     if (blog.user.toString() === req.user._id.toString()) {
         await Blog.findByIdAndRemove(req.params.id)
         res.status(204).end()
@@ -59,7 +63,7 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (req, res) => {
 
 })
 
-blogsRouter.put('/:id', async (req, res, next) => {
+blogsRouter.put('/:id', middleware.userExtractor , async (req, res, next) => {
     const updatedBlog = req.body
 
     await Blog.findByIdAndUpdate(req.params.id, updatedBlog)

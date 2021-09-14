@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { SuccessMsg, ErrorMsg } from './components/notifications'
 
+import Toggleable from './components/Toggleable'
+import BlogForm from './components/BlogForm'
+
+import jwt from 'jwt-decode'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -12,18 +16,24 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
-
   const [successMsg, setSuccessMsg] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
 
+  const [tokenId, setTokenId] = useState('') 
+
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    getAllBLogs()
   }, [])
+
+  const getAllBLogs = () => {
+    blogService.getAll().then(blogs => {
+      const sorted = blogs.sort((a, b) => {
+        return b.likes - a.likes
+      })
+      setBlogs(sorted)
+    }
+    )
+  }
 
   useEffect(() => {
     const loggedIn = localStorage.getItem('user')
@@ -31,9 +41,14 @@ const App = () => {
       const user = JSON.parse(loggedIn)
       setUser(user)
       blogService.setToken(user.token)
+      const authenticatedUser = JSON.parse(localStorage.getItem('user'))
+      const decoded = jwt(authenticatedUser.token)
+      setTokenId(decoded.id)
     }
   }, [])
 
+
+  ///////// LOGIN
   const handleLogin = async (e) => {
     e.preventDefault()
     const credentials = {
@@ -60,6 +75,11 @@ const App = () => {
     }
   }
 
+  const onLogoutClick = () => {
+    localStorage.clear()
+    setUser(null)
+  }
+
   const renderLoginForm = () => {
     return (
       <form onSubmit={handleLogin}>
@@ -74,6 +94,28 @@ const App = () => {
     )
   }
 
+  ///////// BLOGS
+
+  const blogFormRef = useRef()
+
+  const createNewBlog = async (blog) => {
+    blogFormRef.current.toggleVisibility()
+
+    try {
+      const res = await blogService.addBlogPost(blog)
+      const sorted = blogs.sort((a, b) => {
+        return b.likes - a.likes
+      })
+      setBlogs(sorted.concat(res))
+      getAllBLogs()
+    } catch (e) {
+      setErrorMsg('Wrong or missing authorization!')
+      setTimeout(() => {
+        setErrorMsg('')
+      }, 4000)
+    }
+  }
+
   const renderBlogList = () => {
     const savedUser = localStorage.getItem('user')
     const parsedUser = JSON.parse(savedUser)
@@ -84,54 +126,17 @@ const App = () => {
         <button onClick={onLogoutClick}>Log out!</button>
         <div>
           <h2>Create a new blog</h2>
-          {renderCreateBlogForm()}
+          <Toggleable buttonLabel='Create new blog' buttonCancel='Cancel' ref={blogFormRef}>
+            <BlogForm
+              createBlog={createNewBlog}
+            />
+          </Toggleable>
         </div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} getAllBLogs={getAllBLogs} tokenId={tokenId}/>
         )}
       </>
     )
-  }
-
-  const renderCreateBlogForm = () => {
-    return (
-      <>
-        <form onSubmit={createNewBlog}>
-          <div>
-            Title: <input type='text' value={title} onChange={(e) => { setTitle(e.target.value) }} />
-          </div>
-          <div>
-            Author: <input type='text' value={author} onChange={(e) => { setAuthor(e.target.value) }} />
-          </div>
-          <div>
-            URL: <input type='text' value={url} onChange={(e) => { setUrl(e.target.value) }} />
-          </div>
-          <button type='submit'>Create new blog</button>
-        </form>
-      </>
-    )
-  }
-
-  const createNewBlog = async (e) => {
-    e.preventDefault()
-    const blog = {
-      title, author, url
-    }
-
-    try {
-      const res = await blogService.addBlogPost(blog)
-      setBlogs(blogs.concat(res))
-    } catch (e) {
-      setErrorMsg('Wrong or missing authorization!')
-      setTimeout(() => {
-        setErrorMsg('')
-      }, 4000)
-    }
-  }
-
-  const onLogoutClick = () => {
-    localStorage.clear()
-    setUser(null)
   }
 
   return (
