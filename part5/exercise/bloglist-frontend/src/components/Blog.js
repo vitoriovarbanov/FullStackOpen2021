@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Toggleable from '../components/Toggleable'
 import blogService from '../services/blogs'
 
+import PropTypes from 'prop-types'
+
 const Blog = ({ blog, getAllBLogs, tokenId }) => {
   const [likes, setLikes] = useState(null)
 
@@ -76,6 +78,12 @@ const Blog = ({ blog, getAllBLogs, tokenId }) => {
       </Toggleable>
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  getAllBLogs: PropTypes.func.isRequired,
+  tokenId: PropTypes.string.isRequired
 }
 
 export default Blog
