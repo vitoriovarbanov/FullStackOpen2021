@@ -12,9 +12,9 @@ const initialState = {
         }
     ],
     filter: 'IMPORTANT'
-} 
+}
 
-const noteReducer = (state = initialState.notes, action) => {
+const noteReducer = (state = [], action) => {
     if (action.type === 'NEW_NOTE') {
         const newState = state.concat(action.data)
         return newState
@@ -28,6 +28,8 @@ const noteReducer = (state = initialState.notes, action) => {
         return state.map(note =>
             note.id !== id ? note : changedNote
         )
+    } else if (action.type === 'INIT_NOTES') {
+        return action.data
     }
 
     return state
@@ -37,14 +39,17 @@ const generateId = () => {
     return Math.floor(Math.random() * 1000000)
 }
 
-export const createNote = (content) => {
+export const initNotes = (notes) => {
+    return{
+        type: 'INIT_NOTES',
+        data: notes
+    }
+}
+
+export const createNote = (data) => {
     return {
         type: 'NEW_NOTE',
-        data: {
-            content,
-            important: false,
-            id: generateId()
-        }
+        data
     }
 }
 

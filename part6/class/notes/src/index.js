@@ -7,12 +7,14 @@ import filterReducer from './reducers/filterReducer'
 import App from './App'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
+
 const reducer = combineReducers({
   notes: noteReducer,
   filter: filterReducer
 })
 
 const store = createStore(reducer,composeWithDevTools())
+
 
 console.log(store.getState())
 
