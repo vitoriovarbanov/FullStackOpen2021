@@ -10,20 +10,22 @@ const AnecdoteList = () => {
     const dispatch = useDispatch()
 
     const getFilteredItems = () => {
-        const filtered = anecdotes.filter(x=>x.content.includes(term))
-        return (
-            filtered.map(anecdote =>
-                <div key={anecdote.id}>
-                    <div>
-                        {anecdote.content}
+        if (anecdotes) {
+            const filtered = anecdotes.filter(x => x.content.includes(term))
+            return (
+                filtered.map(anecdote =>
+                    <div key={anecdote.id}>
+                        <div>
+                            {anecdote.content}
+                        </div>
+                        <div>
+                            has {anecdote.votes}
+                            <button onClick={() => vote(anecdote.id)}>vote</button>
+                        </div>
                     </div>
-                    <div>
-                        has {anecdote.votes}
-                        <button onClick={() => vote(anecdote.id)}>vote</button>
-                    </div>
-                </div>
+                )
             )
-        )
+        }
     }
 
     const vote = (id) => {

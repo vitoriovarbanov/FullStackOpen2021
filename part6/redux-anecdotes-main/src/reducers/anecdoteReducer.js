@@ -35,14 +35,14 @@ export const createAnecdote = (content) => {
   }
 }
 
-/*  export const filterAnecdotes = (term) => {
+export const getAnectodesArray = (anecdotes) =>{
   return {
-    type: 'FILTER_ALL', 
-    term
+    type: 'INIT_FETCH',
+    data: anecdotes
   }
-} */
+}
 
-const reducer = (state = initialState, action) => {
+const reducer = (state = [], action) => {
   console.log('state now: ', state)
   console.log('action', action)
   switch (action.type) {
@@ -56,13 +56,8 @@ const reducer = (state = initialState, action) => {
     case 'CREATE_ANECDOTE':
       const anecdoteToObj = asObject(action.data)
       return state.concat(anecdoteToObj).sort((a, b) => b.votes - a.votes)
-    /* case 'FILTER_ALL':
-      const searchTerm = action.term
-      if(searchTerm===''){
-        return initialState
-      }
-      const filtered = state.filter(x=>x.content.includes(searchTerm))
-      return filtered */
+    case 'INIT_FETCH':
+      return action.data
     default:
       return state
   }
