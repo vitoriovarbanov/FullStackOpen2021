@@ -10,9 +10,7 @@ import { getAnectodesArray } from './reducers/anecdoteReducer'
 const App = () => {
   const dispatch = useDispatch()
   useEffect(()=>{
-    anecdotesService
-      .fetchAnecdotes()
-      .then(data=>dispatch(getAnectodesArray(data)))
+    dispatch(getAnectodesArray())
   },[dispatch])
 
   return (
