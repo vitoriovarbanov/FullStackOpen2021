@@ -1,25 +1,34 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+//import { useDispatch, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { filterAction } from '../reducers/filterReducer'
 
-const FilterForm = () => {
-    const dispatch = useDispatch()
+const FilterForm = (props) => {
+    //const dispatch = useDispatch()
 
-    const handleFilter = (e) =>{
+    const handleFilter = (e) => {
         e.preventDefault()
         const searchTerm = e.target.value
         console.log(searchTerm)
-        dispatch(filterAction(searchTerm))
+        props.filterAction(searchTerm)
     }
 
-    return(
+    return (
         <div>
             <form onChange={handleFilter}>
-                <input name='filterAnecdotes'/>
+                <input name='filterAnecdotes' />
             </form>
         </div>
     )
 }
 
+const mapDispatchToProps = dispatch => {
+    return {
+        filterAction: term => {
+            dispatch(filterAction(term))
+        },
+    }
+}
 
-export default FilterForm
+const ConnectedFilterForm = connect(null, mapDispatchToProps)(FilterForm)
+export default ConnectedFilterForm
