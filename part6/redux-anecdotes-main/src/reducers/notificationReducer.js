@@ -9,18 +9,18 @@ const notificationReducer = (state = '', action) => {
     }
 }
 
-export const createNotification = (message, notificatinDuration) => {
+export const createNotification = (message, notificationDuration) => {
     return async dispatch => {
+        dispatch({
+            type: 'NEW_NOTIFICATION',
+            message
+        })
         setTimeout(() => {
             dispatch({
                 type: 'NEW_NOTIFICATION',
                 message: ''
             })
-        }, notificatinDuration)
-        dispatch({
-            type: 'NEW_NOTIFICATION',
-            message
-        })
+        }, notificationDuration)
     }
 }
 
