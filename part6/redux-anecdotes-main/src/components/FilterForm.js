@@ -9,7 +9,7 @@ const FilterForm = (props) => {
     const handleFilter = (e) => {
         e.preventDefault()
         const searchTerm = e.target.value
-        console.log(searchTerm)
+        //console.log(searchTerm)
         props.filterAction(searchTerm)
     }
 

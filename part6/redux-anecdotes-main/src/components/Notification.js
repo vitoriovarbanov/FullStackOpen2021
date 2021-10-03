@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 const Notification = (props) => {
   //const notification = useSelector(state => state.notifications)
-  console.log(props.notifications)
+  //console.log(props.notifications)
   const style = {
     border: 'solid',
     padding: 10,

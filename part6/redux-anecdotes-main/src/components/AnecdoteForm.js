@@ -11,7 +11,7 @@ const AnecdoteForm = (props) => {
         e.preventDefault()
         const content = e.target.anecdote.value
         e.target.anecdote.value = ''
-        console.log(content)
+        //console.log(content)
         props.createAnecdote(content)
         const message = 'You have created a new entry!';
         props.createNotification(message, 5000)
