@@ -22,11 +22,14 @@ const asObject = (anecdote) => {
 const initialState = anecdotesAtStart.map(asObject)
 
 export const voteForAnecdote = (id) => {
-  return {
-    type: 'VOTE',
-    data: {
-      id
-    }
+  return async dispatch => {
+    const updatedAnecdote = await anecdotesService.updateVotes(id)
+    dispatch({
+      type: 'VOTE',
+      data: {
+        id
+      }
+    })
   }
 }
 
