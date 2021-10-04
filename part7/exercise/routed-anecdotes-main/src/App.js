@@ -69,19 +69,23 @@ const Footer = () => (
 
 const CreateNew = ({ addNew }) => {
   let history = useHistory()
-  const contentField = useField('text')
-  const content = contentField.value
-  const authorField = useField('text')
-  const author = authorField.value
-  const infoField = useField('text')
-  const info = infoField.value
+
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
+
+  const reset = () =>{
+    content.reset()
+    author.reset()
+    info.reset()
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     addNew({
-      content,
-      author,
-      info,
+      'content': content.value,
+      'author': author.value,
+      'info': info.value,
       votes: 0
     })
     history.push('/')
@@ -93,18 +97,25 @@ const CreateNew = ({ addNew }) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...contentField} />
+          <input value={content.value}
+                 type={content.type}
+                 onChange={content.onChange} />
         </div>
         <div>
           author
-          <input {...authorField} />
+          <input value={author.value}
+                 type={author.type}
+                 onChange={author.onChange} />
         </div>
         <div>
           url for more info
-          <input {...infoField} />
+          <input value={info.value}
+                 type={info.type}
+                 onChange={info.onChange} />
         </div>
         <button>create</button>
       </form>
+      <button onClick={reset}>reset</button>
     </div>
   )
 
@@ -164,7 +175,7 @@ const App = () => {
       <Notification notification={notification} />
       <Switch>
         <Route path='/create'>
-          <CreateNew addNew={addNew}/>
+          <CreateNew addNew={addNew} />
         </Route>
         <Route path='/about'>
           <About />
