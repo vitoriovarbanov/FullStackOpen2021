@@ -1,9 +1,10 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+//import { useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 
-const Notification = () => {
-  const notification = useSelector(state => state.notifications)
-
+const Notification = (props) => {
+  //const notification = useSelector(state => state.notifications)
+  //console.log(props.notifications)
   const style = {
     border: 'solid',
     padding: 10,
@@ -12,10 +13,17 @@ const Notification = () => {
     marginBottom: '10px'
   }
   return (
-    <div style={!notification ? {display: 'none'} : style}>
-      {notification}
+    <div style={!props.notifications ? { display: 'none' } : style}>
+      {props.notifications}
     </div>
   )
 }
 
-export default Notification
+const mapStateToProps = (state) => {
+  return {
+    notifications: state.notifications
+  }
+}
+
+const ConnectedNotifcations = connect(mapStateToProps)(Notification)
+export default ConnectedNotifcations
