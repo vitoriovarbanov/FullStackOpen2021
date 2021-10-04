@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
-import {
+//ROUTER TASKS//////////
+/* import {
   BrowserRouter as Router,
   Switch,
   Route,
@@ -149,5 +150,50 @@ const App = () => {
     </div>
   )
 }
+ */
+
+const useCounter = () => {
+  const [value, setValue] = useState(0)
+
+  const increase = () => {
+    setValue(value + 1)
+  }
+
+  const decrease = () => {
+    setValue(value - 1)
+  }
+
+  const zero = () => {
+    setValue(0)
+  }
+
+  return {
+    value,
+    increase,
+    decrease,
+    zero
+  }
+}
+
+const App = (props) => {
+  const counter = useCounter()
+
+  return (
+    <div>
+      <div>{counter.value}</div>
+      <button onClick={() => setCounter(counter.increase)}>
+        plus
+      </button>
+      <button onClick={() => setCounter(counter.decrease)}>
+        minus
+      </button>
+      <button onClick={() => setCounter(counter.zero)}>
+        zero
+      </button>
+    </div>
+  )
+}
+
+
 
 export default App;
