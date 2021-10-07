@@ -1,25 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
-import loginService from './services/login'
-import { SuccessMsg, ErrorMsg } from './components/notifications'
+
+import { NotificationMessage } from './components/notifications'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Toggleable from './components/Toggleable'
 import BlogForm from './components/BlogForm'
 
 import jwt from 'jwt-decode'
+//REDUCERS
+import { setStoreUsername } from './reducers/usernameReducer'
+import { setPasswordAction } from './reducers/passwordReducer'
+import { loginAction, logoutAction, setUser } from './reducers/loginReducer'
+import { setNotifications } from './reducers/notificationReducer'
+
 
 const App = () => {
+  const dispatch = useDispatch()
   const [blogs, setBlogs] = useState([])
 
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
+  const username = useSelector(state => state.username)
+  const password = useSelector(state => state.password)
+  const user = useSelector(state => state.loggedUser)
 
-  const [successMsg, setSuccessMsg] = useState('')
-  const [errorMsg, setErrorMsg] = useState('')
+  const notifyMessage = useSelector(state => state.notifications)
 
-  const [tokenId, setTokenId] = useState('') 
+  const [tokenId, setTokenId] = useState('')
 
   useEffect(() => {
     getAllBLogs()
@@ -39,14 +46,13 @@ const App = () => {
     const loggedIn = localStorage.getItem('user')
     if (loggedIn) {
       const user = JSON.parse(loggedIn)
-      setUser(user)
+      dispatch(setUser(user))
       blogService.setToken(user.token)
       const authenticatedUser = JSON.parse(localStorage.getItem('user'))
       const decoded = jwt(authenticatedUser.token)
       setTokenId(decoded.id)
     }
-  }, [])
-
+  }, [dispatch])
 
   ///////// LOGIN
   const handleLogin = async (e) => {
@@ -55,39 +61,40 @@ const App = () => {
       username,
       password
     }
-    try {
-      const loggedUser = await loginService.login(credentials)
-      localStorage.setItem('user', JSON.stringify(loggedUser))
-      blogService.setToken(loggedUser.token)
-      setUser(loggedUser)
-      setUsername('')
-      setPassword('')
-      console.log(`User logging in`, loggedUser)
-      setSuccessMsg(`User logged in - ${loggedUser.username}`)
-      setTimeout(() => {
-        setSuccessMsg('')
-      }, 4000)
-    } catch (err) {
-      setErrorMsg('Wrong username or password!')
-      setTimeout(() => {
-        setErrorMsg('')
-      }, 4000)
-    }
+    dispatch(loginAction(credentials))
+    dispatch(setStoreUsername(''))
+    dispatch(setPasswordAction(''))
+
   }
 
   const onLogoutClick = () => {
-    localStorage.clear()
-    setUser(null)
+    try{
+      dispatch(logoutAction())
+      dispatch(setNotifications('Log out successfully!', 3000, 'success'))
+    }catch(e){
+      console.log(e)
+    }
+    
+  }
+
+  const handleUsernameSet = (e) => {
+    e.preventDefault()
+    dispatch(setStoreUsername(e.target.value))
+  }
+
+  const handlePasswordSet = (e) => {
+    e.preventDefault()
+    dispatch(setPasswordAction(e.target.value))
   }
 
   const renderLoginForm = () => {
     return (
       <form onSubmit={handleLogin}>
         <div>
-          Username: <input type='text' value={username} onChange={(e) => { setUsername(e.target.value) }} />
+          Username: <input onChange={(handleUsernameSet)} />
         </div>
         <div>
-          Password: <input type='password' value={password} onChange={(e) => { setPassword(e.target.value) }} />
+          Password: <input type='password' onChange={handlePasswordSet} />
         </div>
         <button type='submit'>Login</button>
       </form>
@@ -109,10 +116,8 @@ const App = () => {
       setBlogs(sorted.concat(res))
       getAllBLogs()
     } catch (e) {
-      setErrorMsg('Wrong or missing authorization!')
-      setTimeout(() => {
-        setErrorMsg('')
-      }, 4000)
+      console.log(e)
+      //dispatch(setErrorNotification('Wrong or missing authorization!'))
     }
   }
 
@@ -133,7 +138,7 @@ const App = () => {
           </Toggleable>
         </div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} getAllBLogs={getAllBLogs} tokenId={tokenId}/>
+          <Blog key={blog.id} blog={blog} getAllBLogs={getAllBLogs} tokenId={tokenId} />
         )}
       </>
     )
@@ -142,10 +147,7 @@ const App = () => {
   return (
     <div>
       <div>
-        <SuccessMsg message={successMsg} />
-      </div>
-      <div>
-        <ErrorMsg message={errorMsg} />
+        <NotificationMessage message={notifyMessage.message} msgType={notifyMessage.msgType} />
       </div>
       <div>
         {!user ? renderLoginForm() : renderBlogList()}

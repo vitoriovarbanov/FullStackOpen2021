@@ -1,31 +1,16 @@
 import React from 'react'
 
-const SuccessMsg = ({message}) => {
+const NotificationMessage = ({message,msgType}) => {
+    const messageColor = msgType === 'error' ? 'red' : 'green';
     const divStyle = {
-        color: 'green',
-        border: '1px solid green',
+        color: messageColor,
+        border: '1px solid black',
         width: '100%',
-        height: '50px'
-    };
-
-    if(!message){
-        return <></>
-    }
-
-    return(
-        <div style={divStyle}>
-            {message}
-        </div>
-    )
-
-}
-
-const ErrorMsg = ({message}) => {
-    const divStyle = {
-        color: 'red',
-        border: '1px solid red',
-        width: '100%',
-        height: '50px'
+        height: '50px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: '10px'
     };
 
     if(!message){
@@ -40,5 +25,5 @@ const ErrorMsg = ({message}) => {
 }
 
 export {
-    SuccessMsg, ErrorMsg
+    NotificationMessage
 }
