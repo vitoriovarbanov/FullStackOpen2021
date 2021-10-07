@@ -7,12 +7,11 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import Toggleable from './components/Toggleable'
 import BlogForm from './components/BlogForm'
+import RenderLoginForm from './components/Login'
 
 import jwt from 'jwt-decode'
 //REDUCERS
-import { setStoreUsername } from './reducers/usernameReducer'
-import { setPasswordAction } from './reducers/passwordReducer'
-import { loginAction, logoutAction, setUser } from './reducers/loginReducer'
+import { logoutAction, setUser } from './reducers/loginReducer'
 import { setNotifications } from './reducers/notificationReducer'
 
 
@@ -20,8 +19,6 @@ const App = () => {
   const dispatch = useDispatch()
   const [blogs, setBlogs] = useState([])
 
-  const username = useSelector(state => state.username)
-  const password = useSelector(state => state.password)
   const user = useSelector(state => state.loggedUser)
 
   const notifyMessage = useSelector(state => state.notifications)
@@ -55,50 +52,14 @@ const App = () => {
   }, [dispatch])
 
   ///////// LOGIN
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    const credentials = {
-      username,
-      password
-    }
-    dispatch(loginAction(credentials))
-    dispatch(setStoreUsername(''))
-    dispatch(setPasswordAction(''))
-
-  }
-
   const onLogoutClick = () => {
-    try{
+    try {
       dispatch(logoutAction())
       dispatch(setNotifications('Log out successfully!', 3000, 'success'))
-    }catch(e){
+    } catch (e) {
       console.log(e)
     }
-    
-  }
 
-  const handleUsernameSet = (e) => {
-    e.preventDefault()
-    dispatch(setStoreUsername(e.target.value))
-  }
-
-  const handlePasswordSet = (e) => {
-    e.preventDefault()
-    dispatch(setPasswordAction(e.target.value))
-  }
-
-  const renderLoginForm = () => {
-    return (
-      <form onSubmit={handleLogin}>
-        <div>
-          Username: <input onChange={(handleUsernameSet)} />
-        </div>
-        <div>
-          Password: <input type='password' onChange={handlePasswordSet} />
-        </div>
-        <button type='submit'>Login</button>
-      </form>
-    )
   }
 
   ///////// BLOGS
@@ -122,14 +83,14 @@ const App = () => {
   }
 
   const renderBlogList = () => {
-    const savedUser = localStorage.getItem('user')
-    const parsedUser = JSON.parse(savedUser)
     return (
       <>
         <h2>blogs</h2>
-        {parsedUser.username} logged in!
-        <button onClick={onLogoutClick}>Log out!</button>
         <div>
+          <div>
+            {user.username} logged in!
+            <button onClick={onLogoutClick}>Log out!</button>
+          </div>
           <h2>Create a new blog</h2>
           <Toggleable buttonLabel='Create new blog' buttonCancel='Cancel' ref={blogFormRef}>
             <BlogForm
@@ -150,7 +111,7 @@ const App = () => {
         <NotificationMessage message={notifyMessage.message} msgType={notifyMessage.msgType} />
       </div>
       <div>
-        {!user ? renderLoginForm() : renderBlogList()}
+        {!user ? <RenderLoginForm /> : renderBlogList()}
       </div>
     </div>
   )

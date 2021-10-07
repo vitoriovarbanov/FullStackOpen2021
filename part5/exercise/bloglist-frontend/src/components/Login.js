@@ -1,56 +1,50 @@
-/* import { setStoreUsername } from './reducers/usernameReducer'
-import { setPasswordAction } from './reducers/passwordReducer'
-import { loginAction, logoutAction } from './reducers/loginReducer'
+import { useDispatch, useSelector } from 'react-redux'
 
-const handleLogin = async (e) => {
+import { setStoreUsername } from '../reducers/usernameReducer'
+import { setPasswordAction } from '../reducers/passwordReducer'
+import { loginAction } from '../reducers/loginReducer'
+
+const RenderLoginForm = () => {
+    const dispatch = useDispatch()
     const username = useSelector(state => state.username)
     const password = useSelector(state => state.password)
-    e.preventDefault()
-    const credentials = {
-        username,
-        password
-    }
-    try {
+    const user = useSelector(state => state.loggedUser)
+
+    const handleLogin = async (e) => {
+        e.preventDefault()
+        const credentials = {
+            username,
+            password
+        }
         dispatch(loginAction(credentials))
         dispatch(setStoreUsername(''))
         dispatch(setPasswordAction(''))
-        console.log(`User logging in`, loggedUser)
-        setSuccessMsg(`User logged in - ${loggedUser.username}`)
-        setTimeout(() => {
-          setSuccessMsg('')
-        }, 4000) 
-    } catch (err) {
-        setErrorMsg('Wrong username or password!')
-        setTimeout(() => {
-            setErrorMsg('')
-        }, 4000)
+
     }
-}
 
-const onLogoutClick = () => {
-    dispatch(logoutAction())
-}
+    const handleUsernameSet = (e) => {
+        e.preventDefault()
+        dispatch(setStoreUsername(e.target.value))
+    }
 
-const handleUsernameSet = (e) => {
-    e.preventDefault()
-    dispatch(setStoreUsername(e.target.value))
-}
+    const handlePasswordSet = (e) => {
+        e.preventDefault()
+        dispatch(setPasswordAction(e.target.value))
+    }
 
-const handlePasswordSet = (e) => {
-    e.preventDefault()
-    dispatch(setPasswordAction(e.target.value))
-}
-
-const renderLoginForm = () => {
     return (
-        <form onSubmit={handleLogin}>
-            <div>
-                Username: <input onChange={(handleUsernameSet)} />
-            </div>
-            <div>
-                Password: <input type='password' onChange={handlePasswordSet} />
-            </div>
-            <button type='submit'>Login</button>
-        </form>
+        <div>
+            <form onSubmit={handleLogin}>
+                <div>
+                    Username: <input onChange={(handleUsernameSet)} />
+                </div>
+                <div>
+                    Password: <input type='password' onChange={handlePasswordSet} />
+                </div>
+                <button type='submit'>Login</button>
+            </form>
+        </div>
     )
-} */
+}
+
+export default RenderLoginForm
